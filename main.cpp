@@ -21,13 +21,38 @@ int main(int argc, char *argv[]) {
     auto fileSize = std::filesystem::file_size(fileName);
     std::cout << fileSize << std::endl;
     int lineCount = 0;
+    int wordCount = 0;
+    std::size_t charCount = 0;
     std::string line;
+    std::string word;
     while(getline(file, line)) {
         lineCount++;
+        std::stringstream ss(line);
+        while(ss >> word) {
+            wordCount++;
+        }
+        charCount += line.length();
     }
+    std::cout << charCount << std::endl;
+    std::cout << wordCount << std::endl;
     std::cout << lineCount << std::endl;
 
     file.close();
+    file.open(fileName); // open the file again to read from start
+    char c;
+    int charCount1 = 0;
+    int allCharCount = 0;
+    while(file.get(c)) {
+        // UTF-8 allows multi-byte characters. Count only the starting byte for each character to get accurate -m count
+        // https://stackoverflow.com/a/3586973
+        if ((c & 0xc0) != 0x80) {
+            charCount1++;
+        }
+        allCharCount++;
+    }
+    std::cout << allCharCount << std::endl;
+    std::cout << charCount1 << std::endl;
+
     return 0;
 }
 
